@@ -17,8 +17,27 @@ setupSwagger(app);
 app.use(helmet());
 
 // CORS
+const localFrontendOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5174',
+];
+const configuredFrontendOrigins = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const allowedFrontendOrigins = new Set([...localFrontendOrigins, ...configuredFrontendOrigins]);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || allowedFrontendOrigins.has(origin)) {
+      return callback(null, true);
+    }
+
+    callback(new Error('Origin is not allowed by CORS'));
+  },
   credentials: true,
 }));
 

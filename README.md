@@ -91,11 +91,12 @@ Use Swagger UI to:
 ### Health Check
 - `GET /api/health` - Check if API is running
 
-### Authentication (To be implemented)
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/refresh` - Refresh JWT token
-- `POST /api/auth/logout` - User logout
+### Authentication
+- `POST /api/auth/register` - Create a user account; accepts `name`, `email`, and `password`; assigns the `user` role and returns a JWT.
+- `POST /api/auth/login` - Sign in with `email` and `password`; returns a JWT.
+- `GET /api/auth/me` - Return the authenticated user; requires `Authorization: Bearer <token>`.
+
+The API is stateless: sign-out is performed by removing the access token in the client. Registration passwords must be at least 8 characters; the API hashes them before storage. Access tokens expire according to `JWT_EXPIRE` (15 minutes by default).
 
 ### Users (To be implemented)
 - `GET /api/users` - Get all users
@@ -142,7 +143,15 @@ Use Swagger UI to:
 
 ## Environment Variables
 
-Create a `.env` file with:
+Copy `.env.example` to `.env`, then configure MongoDB and generate a private JWT secret. For example, generate a secret with:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Put the generated value in `JWT_SECRET`. Do not commit `.env`.
+
+The required environment variables are:
 
 ```env
 # Server
@@ -153,7 +162,7 @@ NODE_ENV=development
 MONGODB_URI=mongodb://localhost:27017/ecommerce-db
 
 # JWT
-JWT_SECRET=your_secret_key
+JWT_SECRET=your_generated_64_character_hex_secret
 JWT_EXPIRE=15m
 
 # OAuth
@@ -162,7 +171,7 @@ GOOGLE_CLIENT_SECRET=your_secret
 
 # URLs
 API_URL=http://localhost:5000
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:5173
 ```
 
 ## Next Steps

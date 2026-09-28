@@ -6,7 +6,8 @@ const { jwtSecret } = require('../config/jwt');
  */
 const authenticate = (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const authorization = req.headers.authorization || '';
+    const token = authorization.match(/^Bearer\s+(.+)$/i)?.[1];
 
     if (!token) {
       return res.status(401).json({

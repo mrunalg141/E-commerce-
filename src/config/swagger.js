@@ -10,6 +10,15 @@ const options = {
       version: "1.0.0",
       description: "API documentation for the E-commerce backend",
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
     servers: [
       {
         url: "http://localhost:5000",

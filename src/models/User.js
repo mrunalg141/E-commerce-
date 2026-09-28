@@ -2,10 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  passwordHash: { type: String, required: true },
+  name: { type: String, trim: true, maxlength: 100 },
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  passwordHash: { type: String, required: true, select: false },
   role: { type: String, enum: ['user', 'vendor', 'admin'], default: 'user' }
-});
+}, { timestamps: true });
 
 // Compare password helper
 userSchema.methods.comparePassword = function (password) {

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const authRoutes = require('./auth');
 
 /**
  * @swagger
@@ -13,5 +14,7 @@ const router = express.Router();
 router.get('/health', (req, res) => {
   res.json({ success: true });
 });
+
+router.use('/auth', authRoutes);
 
 module.exports = router;
