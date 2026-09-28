@@ -1,0 +1,2 @@
+import { Link } from 'react-router-dom'
+export default function Account() { return <div className="page account-page"><div className="account-card"><p className="eyebrow">Your space</p><h1>Account, <em>coming soon.</em></h1><p>The backend currently includes authentication middleware and role definitions, but no registered login, registration, profile, or order endpoints yet.</p><Link to="/shop" className="button button-dark">Continue shopping <span>↗</span></Link></div></div> }

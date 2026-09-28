@@ -1,0 +1,10 @@
+import { useSearchParams } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import ProductCard from '../components/ProductCard'
+import { categories, products } from '../data/products'
+
+export default function Shop() {
+  const [params, setParams] = useSearchParams(); const [query, setQuery] = useState(''); const [sort, setSort] = useState('featured'); const selected = params.get('category') || 'All pieces'
+  const visible = useMemo(() => products.filter((product) => (selected === 'All pieces' || product.category === selected) && `${product.name} ${product.description}`.toLowerCase().includes(query.toLowerCase())).sort((a, b) => sort === 'low' ? a.price - b.price : sort === 'high' ? b.price - a.price : 0), [selected, query, sort])
+  return <div className="page shop-page"><div className="shop-intro"><p className="eyebrow">The collection</p><h1>Objects for<br /><em>living well.</em></h1><p>Small-batch pieces, practical luxuries, and everyday essentials with a little soul.</p></div><div className="catalog-toolbar"><div className="filter-tabs">{categories.map((category) => <button className={selected === category.name ? 'active' : ''} key={category.name} onClick={() => setParams(category.name === 'All pieces' ? {} : { category: category.name })}>{category.name}</button>)}</div><div className="catalog-tools"><label className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search pieces" /></label><select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort products"><option value="featured">Featured</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></div></div><div className="catalog-count">{visible.length} pieces <span>/</span> {selected}</div><div className="product-grid">{visible.map((product) => <ProductCard product={product} key={product.id} />)}</div>{!visible.length && <div className="empty-state"><h2>No pieces found.</h2><p>Try a different search or collection.</p></div>}</div>
+}
