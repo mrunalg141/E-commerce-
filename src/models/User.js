@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, trim: true, maxlength: 100 },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   passwordHash: { type: String, required: true, select: false },
+  refreshTokenHash: { type: String, select: false },
   role: { type: String, enum: ['user', 'vendor', 'admin'], default: 'user' }
 }, { timestamps: true });
 

@@ -125,6 +125,15 @@ main { min-height: calc(100vh - 170px); }
 .account-main { align-self: center; padding: clamp(32px, 6vw, 76px) clamp(24px, 7vw, 90px); }
 .account-main h1 { margin-bottom: var(--space-4); font-size: clamp(48px, 5.5vw, 72px); line-height: .98; }
 .account-intro { max-width: 380px; margin: 0 0 var(--space-8); color: var(--color-muted); font-size: 13px; line-height: 1.7; }
+.account-profile-title { margin: 0 0 var(--space-3); font: 500 20px/1.2 var(--font-display); }
+.account-profile { margin: 0; border-top: 1px solid var(--color-line); }
+.account-profile-row { display: grid; grid-template-columns: minmax(96px, .45fr) minmax(0, 1fr); align-items: baseline; gap: var(--space-4); padding: var(--space-4) 0; border-bottom: 1px solid var(--color-line); }
+.account-profile-row dt { color: var(--color-muted); font: 500 9px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.account-profile-row dd { min-width: 0; margin: 0; overflow-wrap: anywhere; color: var(--color-ink); font-size: 13px; }
+.account-profile-row .account-role { text-transform: capitalize; }
+.account-session-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-top: var(--space-6); }
+.account-session-actions .account-back-link { margin-top: 0; }
+.account-shopping-link { color: var(--color-ink); }
 .account-tabs { display: flex; gap: var(--space-6); border-bottom: 1px solid var(--color-line); }
 .account-tabs button { position: relative; padding: 0 0 var(--space-3); border: 0; background: transparent; color: var(--color-muted); font-size: 11px; cursor: pointer; }
 .account-tabs button::after { position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; background: var(--color-ink); content: ''; transform: scaleX(0); transform-origin: left; transition: transform 200ms ease; }
@@ -208,6 +217,7 @@ footer { display: flex; justify-content: space-between; gap: var(--space-5); pad
   .catalog-tools select { min-height: 36px; }
   .account-page { padding-top: var(--space-4); }
   .account-main { padding: var(--space-8) var(--space-2); }
+  .account-session-actions { align-items: flex-start; flex-direction: column; }
   .account-aside { min-height: 220px; padding: var(--space-5); }
   .account-aside-mark { right: -8px; font-size: 190px; }
   .account-aside-quote { font-size: 42px; }

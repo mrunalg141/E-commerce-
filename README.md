@@ -89,14 +89,17 @@ Use Swagger UI to:
 - Check request/response formats
 
 ### Health Check
+- `GET /health` - Check if the API is running
 - `GET /api/health` - Check if API is running
 
 ### Authentication
-- `POST /api/auth/register` - Create a user account; accepts `name`, `email`, and `password`; assigns the `user` role and returns a JWT.
-- `POST /api/auth/login` - Sign in with `email` and `password`; returns a JWT.
-- `GET /api/auth/me` - Return the authenticated user; requires `Authorization: Bearer <token>`.
+- `POST /api/auth/register` - Create a user account; accepts `name`, `email`, and `password`; assigns the `user` role and returns a success message.
+- `POST /api/auth/login` - Sign in with `email` and `password`; sets HttpOnly access and refresh cookies.
+- `POST /api/auth/refresh` - Rotate the access and refresh cookies.
+- `POST /api/auth/logout` - Revoke the current refresh token and clear auth cookies.
+- `GET /api/auth/me` - Return the authenticated user; requires the `accessToken` cookie.
 
-The API is stateless: sign-out is performed by removing the access token in the client. Registration passwords must be at least 8 characters; the API hashes them before storage. Access tokens expire according to `JWT_EXPIRE` (15 minutes by default).
+Cookies are HttpOnly, same-site, and secure in production. Production cookies use `SameSite=None` with `Secure` to support separately hosted frontend/API origins; development uses `SameSite=Lax`. Access tokens expire after 15 minutes; refresh tokens expire according to `JWT_REFRESH_EXPIRE` (7 days by default). Registration and login require a valid email and an 8-character password with uppercase, lowercase, and numeric characters. Passwords are hashed before storage.
 
 ### Users (To be implemented)
 - `GET /api/users` - Get all users
@@ -143,13 +146,13 @@ The API is stateless: sign-out is performed by removing the access token in the 
 
 ## Environment Variables
 
-Copy `.env.example` to `.env`, then configure MongoDB and generate a private JWT secret. For example, generate a secret with:
+Copy `.env.example` to `.env`, replace every placeholder, and configure MongoDB. Generate two separate secrets with:
 
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Put the generated value in `JWT_SECRET`. Do not commit `.env`.
+Put one generated value in `JWT_SECRET` and the other in `JWT_REFRESH_SECRET`. Do not commit `.env`.
 
 The required environment variables are:
 
@@ -159,11 +162,12 @@ PORT=5000
 NODE_ENV=development
 
 # Database
-MONGODB_URI=mongodb://localhost:27017/ecommerce-db
+MONGODB_URI=<your-mongodb-connection-string>
 
 # JWT
 JWT_SECRET=your_generated_64_character_hex_secret
-JWT_EXPIRE=15m
+JWT_REFRESH_SECRET=another_generated_64_character_hex_secret
+JWT_REFRESH_EXPIRE=7d
 
 # OAuth
 GOOGLE_CLIENT_ID=your_id
@@ -171,8 +175,10 @@ GOOGLE_CLIENT_SECRET=your_secret
 
 # URLs
 API_URL=http://localhost:5000
-FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=<your-exact-frontend-origin>
 ```
+
+Set `FRONTEND_URL` to the exact browser origin, including port. Frontend Axios requests must use `withCredentials: true` for login, refresh, logout, and protected requests.
 
 ## Next Steps
 - ✓ Project structure setup

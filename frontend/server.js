@@ -1,3 +1,5 @@
+import 'dotenv/config';
+console.log('JWT length:', (process.env.JWT_SECRET || '').length);
 require('dotenv').config();
 const app = require('./src/app');
 const { connectDB } = require('./src/config/database');

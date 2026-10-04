@@ -1,21 +1,10 @@
 import { useEffect, useState } from 'react'
-import { getCurrentUser, registerAccount, signIn } from '../services/auth'
+import { getCurrentUser, registerAccount, signIn, signOut } from '../services/auth'
 import { AuthContext } from './authContextValue'
-const TOKEN_KEY = 'atelier-access-token'
-const USER_KEY = 'atelier-user'
-
-const readStoredUser = () => {
-  try {
-    return JSON.parse(sessionStorage.getItem(USER_KEY) || 'null')
-  } catch {
-    sessionStorage.removeItem(USER_KEY)
-    return null
-  }
-}
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => sessionStorage.getItem(TOKEN_KEY) ? readStoredUser() : null)
-  const [isLoading, setIsLoading] = useState(() => Boolean(sessionStorage.getItem(TOKEN_KEY)))
+  const [user, setUser] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [authNotice, setAuthNotice] = useState('')
 
   useEffect(() => {
@@ -27,14 +16,9 @@ export function AuthProvider({ children }) {
 
     window.addEventListener('atelier:session-expired', clearExpiredSession)
 
-    if (!sessionStorage.getItem(TOKEN_KEY)) {
-      return () => window.removeEventListener('atelier:session-expired', clearExpiredSession)
-    }
-
     getCurrentUser()
       .then((currentUser) => {
         setUser(currentUser)
-        sessionStorage.setItem(USER_KEY, JSON.stringify(currentUser))
       })
       .catch((error) => {
         if (error.response?.status !== 401) {
@@ -46,21 +30,23 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('atelier:session-expired', clearExpiredSession)
   }, [])
 
-  const saveSession = ({ token, user: authenticatedUser }) => {
-    sessionStorage.setItem(TOKEN_KEY, token)
-    sessionStorage.setItem(USER_KEY, JSON.stringify(authenticatedUser))
+  const login = async (credentials) => {
+    const authenticatedUser = await signIn(credentials)
     setUser(authenticatedUser)
     setAuthNotice('')
     setIsLoading(false)
+    return authenticatedUser
   }
 
-  const createAccount = async (details) => saveSession(await registerAccount(details))
-  const login = async (credentials) => saveSession(await signIn(credentials))
-  const logout = () => {
-    sessionStorage.removeItem(TOKEN_KEY)
-    sessionStorage.removeItem(USER_KEY)
-    setUser(null)
-    setAuthNotice('')
+  const createAccount = async (details) => registerAccount(details)
+  const logout = async () => {
+    try {
+      await signOut()
+      setUser(null)
+      setAuthNotice('')
+    } catch {
+      setAuthNotice('Could not sign out right now. Please try again when the account service is available.')
+    }
   }
 
   return <AuthContext.Provider value={{ user, isLoading, authNotice, setAuthNotice, createAccount, login, logout }}>{children}</AuthContext.Provider>

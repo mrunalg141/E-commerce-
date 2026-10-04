@@ -8,13 +8,13 @@ const User = require('../src/models/User');
   await mongoose.connect(process.env.MONGODB_URI);
 
   const users = [
-    { email: 'user@test.com', password: 'password123', role: 'user' },
-    { email: 'vendor@test.com', password: 'password123', role: 'vendor' },
-    { email: 'admin@test.com', password: 'password123', role: 'admin' },
+    { email: 'user@test.com', password: 'Password123', role: 'user' },
+    { email: 'vendor@test.com', password: 'Password123', role: 'vendor' },
+    { email: 'admin@test.com', password: 'Password123', role: 'admin' },
   ];
 
   for (const u of users) {
-    const passwordHash = await bcrypt.hash(u.password, 10);
+    const passwordHash = await bcrypt.hash(u.password, 12);
     await new User({
       email: u.email,
       passwordHash,

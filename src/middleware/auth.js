@@ -1,13 +1,11 @@
-const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../config/jwt');
+const { verifyAccessToken } = require('../config/jwt');
 
 /**
  * Authenticate JWT Token
  */
 const authenticate = (req, res, next) => {
   try {
-    const authorization = req.headers.authorization || '';
-    const token = authorization.match(/^Bearer\s+(.+)$/i)?.[1];
+    const token = req.cookies?.accessToken;
 
     if (!token) {
       return res.status(401).json({
@@ -16,7 +14,10 @@ const authenticate = (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, jwtSecret);
+    const decoded = verifyAccessToken(token);
+    if (decoded.type !== 'access') {
+      return res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    }
     req.user = decoded;
     next();
   } catch (error) {
@@ -30,7 +31,7 @@ const authenticate = (req, res, next) => {
 /**
  * Authorize based on user roles
  */
-const authorize = (...allowedRoles) => {
+const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({
@@ -50,4 +51,4 @@ const authorize = (...allowedRoles) => {
   };
 };
 
-module.exports = { authenticate, authorize };
+module.exports = { authenticate, requireRole, authorize: requireRole };

@@ -12,10 +12,10 @@ const options = {
     },
     components: {
       securitySchemes: {
-        bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
+        accessCookie: {
+          type: "apiKey",
+          in: "cookie",
+          name: "accessToken",
         },
       },
     },

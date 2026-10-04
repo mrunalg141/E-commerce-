@@ -7,6 +7,8 @@ export default function Account() {
 	const [mode, setMode] = useState('signin')
 	const [notice, setNotice] = useState('')
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [email, setEmail] = useState('')
+	const [password, setPassword] = useState('')
 	const isRegistering = mode === 'register'
 
 	const changeMode = (nextMode) => {
@@ -22,13 +24,16 @@ export default function Account() {
 		setIsSubmitting(true)
 		const formValues = new FormData(event.currentTarget)
 		const credentials = {
-			email: formValues.get('email'),
-			password: formValues.get('password'),
+			email,
+			password,
 		}
 
 		try {
 			if (isRegistering) {
 				await createAccount({ ...credentials, name: formValues.get('name') })
+				setMode('signin')
+				setPassword('')
+				setNotice('Account created successfully. Please sign in.')
 			} else {
 				await login(credentials)
 			}
@@ -47,15 +52,15 @@ export default function Account() {
 				<p className="eyebrow">Your Atelier account</p>
 				<h1 id="account-heading">Welcome,<br /><em>{user.name || 'back'}.</em></h1>
 				<p className="account-intro">You are signed in to your Atelier account.</p>
-				<div className="account-profile">
-					<span>Account details</span>
-					<strong>{user.name || user.email}</strong>
-					<p>{user.email}</p>
-					<small>Account type / {user.role}</small>
-				</div>
+				<h2 className="account-profile-title">Account details</h2>
+				<dl className="account-profile">
+					<div className="account-profile-row"><dt>Name</dt><dd>{user.name || '—'}</dd></div>
+					<div className="account-profile-row"><dt>Email</dt><dd>{user.email}</dd></div>
+					<div className="account-profile-row"><dt>Account type</dt><dd className="account-role">{user.role}</dd></div>
+				</dl>
 				<div className="account-session-actions">
 					<button type="button" className="button button-dark" onClick={logout}>Sign out</button>
-					<Link to="/shop" className="account-back-link">Continue shopping <span aria-hidden="true">↗</span></Link>
+					<Link to="/shop" className="account-back-link account-shopping-link">Continue shopping <span aria-hidden="true">↗</span></Link>
 				</div>
 			</div>
 			<aside className="account-aside" aria-label="Atelier Commerce">
@@ -81,8 +86,8 @@ export default function Account() {
 
 				<form className="account-form" onSubmit={handleSubmit}>
 					{isRegistering && <label className="account-field">Full name<input type="text" name="name" autoComplete="name" placeholder="Your name" required /></label>}
-					<label className="account-field">Email address<input type="email" name="email" autoComplete="email" placeholder="you@example.com" required /></label>
-					<label className="account-field">Password<input type="password" name="password" autoComplete={isRegistering ? 'new-password' : 'current-password'} placeholder="Enter your password" minLength={isRegistering ? 8 : undefined} required /></label>
+					<label className="account-field">Email address<input type="email" name="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
+					<label className="account-field">Password<input type="password" name="password" autoComplete={isRegistering ? 'new-password' : 'current-password'} placeholder="Enter your password" value={password} onChange={(event) => setPassword(event.target.value)} minLength={isRegistering ? 8 : undefined} required /></label>
 					<button type="submit" className="button button-dark account-submit" disabled={isSubmitting}>{isSubmitting ? 'Connecting...' : isRegistering ? 'Create account' : 'Sign in'} <span aria-hidden="true">↗</span></button>
 					<p className="account-note" aria-live="polite">{notice || authNotice || 'Your account is protected with a secure sign-in session.'}</p>
 				</form>
